@@ -9,5 +9,21 @@
  * @author Fran De La Torre
  */
 public class jornadas {
+
+    String jornada, fecha;
+
+    public jornadas(String jornada, String fecha) {
+        this.jornada = jornada;
+        this.fecha = fecha;
+    }
+
+    
+    public String getJornada(){
+        return jornada;
+    }
+    
+    public String getFecha(){
+        return fecha;
+    }
     
 }
