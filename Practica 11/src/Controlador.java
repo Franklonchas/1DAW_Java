@@ -29,4 +29,18 @@ public class Controlador {
         }
     }
     
+    public ResultSet ObtenerCursos() {
+        String sentenciaSQL = "SELECT curso FROM cursos";
+        try {
+            sentencia = conexion.createStatement();
+            resultado = sentencia.executeQuery(sentenciaSQL);
+
+        } catch (SQLException e) {
+            System.out.print("No se pudo realizar consulta");
+            e.printStackTrace();
+            return null;
+        }
+        return resultado;
+    }
+    
 }

@@ -13,11 +13,28 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Vista extends javax.swing.JFrame {
 
+    Controlador control;
     /**
      * Creates new form Vista
      */
     public Vista() {
         initComponents();
+        control = new Controlador();
+        rellenarListaDesplegable();
+    }
+    
+    public void rellenarListaDesplegable() {
+        ResultSet resultado = control.ObtenerCursos();
+        try {
+            if (resultado != null) {
+                cCurso.removeAll();
+                while (resultado.next()) {
+                    cCurso.addItem(resultado.getString("curso"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("FALLO rellenarLista()");
+        }
     }
 
     /**
