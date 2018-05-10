@@ -120,8 +120,14 @@
           </Properties>
         </Component>
         <Component class="java.awt.Choice" name="cCurso">
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="cCursoItemStateChanged"/>
+          </Events>
         </Component>
         <Component class="java.awt.Choice" name="cEvaluacion">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="cEvaluacion.add(&quot;Evaluacion 1&quot;);&#xa;cEvaluacion.add(&quot;Evaluacion 2&quot;);&#xa;cEvaluacion.add(&quot;Evaluacion 3&quot;);&#xa;cEvaluacion.add(&quot;Evaluacion FINAL&quot;);"/>
+          </AuxValues>
         </Component>
         <Component class="java.awt.Choice" name="cAsignatura">
         </Component>

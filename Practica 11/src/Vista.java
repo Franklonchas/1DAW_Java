@@ -1,5 +1,6 @@
 
 import java.sql.*;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,26 +15,55 @@ import javax.swing.table.DefaultTableModel;
 public class Vista extends javax.swing.JFrame {
 
     Controlador control;
+    Alumnos alumno;
+    Asignaturas asignatura;
+    Cursos curso;
+    Notas nota;
+    ArrayList<Cursos> listaCursos;
+    ArrayList<Asignaturas> listaAsignaturas;
+
     /**
      * Creates new form Vista
      */
     public Vista() {
         initComponents();
         control = new Controlador();
+        listaCursos = new ArrayList<Cursos>();
+        listaAsignaturas = new ArrayList<Asignaturas>();
         rellenarListaDesplegable();
+        rellenarListaAsignaturas();
     }
-    
+
     public void rellenarListaDesplegable() {
         ResultSet resultado = control.ObtenerCursos();
         try {
             if (resultado != null) {
                 cCurso.removeAll();
                 while (resultado.next()) {
-                    cCurso.addItem(resultado.getString("curso"));
+                    curso = new Cursos(resultado.getInt("idCurso"), resultado.getString("curso"));
+                    listaCursos.add(curso);
+                    cCurso.addItem(curso.getCurso());
                 }
             }
         } catch (SQLException e) {
             System.out.println("FALLO rellenarLista()");
+        }
+    }
+
+    public void rellenarListaAsignaturas() {
+        int cursoSeleccionado = listaCursos.get(cCurso.getSelectedIndex()).getIdCurso();
+        ResultSet res = control.ObtenerAsignaturas(cursoSeleccionado);
+        if (res != null) {
+            cAsignatura.removeAll();
+            try {
+                while (res.next()) {
+                    asignatura = new Asignaturas(res.getInt("idAsignatura"), res.getInt("idCurso"), res.getString("asignatura"));
+                    listaAsignaturas.add(asignatura);
+                    cAsignatura.addItem(asignatura.getAsignatura());
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al rellenar lista desplegable de Asignaturas");
+            }
         }
     }
 
@@ -82,6 +112,12 @@ public class Vista extends javax.swing.JFrame {
 
         aplicar.setText("Aplicar");
 
+        cCurso.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cCursoItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -125,6 +161,11 @@ public class Vista extends javax.swing.JFrame {
                     .addComponent(cEvaluacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(14, 14, 14))
         );
+
+        cEvaluacion.add("Evaluacion 1");
+        cEvaluacion.add("Evaluacion 2");
+        cEvaluacion.add("Evaluacion 3");
+        cEvaluacion.add("Evaluacion FINAL");
 
         getContentPane().add(jPanel1);
         jPanel1.setBounds(54, 38, 639, 121);
@@ -255,6 +296,10 @@ public class Vista extends javax.swing.JFrame {
     private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
         System.exit(0);
     }//GEN-LAST:event_salirActionPerformed
+
+    private void cCursoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cCursoItemStateChanged
+        rellenarListaAsignaturas();
+    }//GEN-LAST:event_cCursoItemStateChanged
 
     /**
      * @param args the command line arguments

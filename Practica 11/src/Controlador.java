@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
  * @author Fran De La Torre
  */
 public class Controlador {
-    
+
     DefaultTableModel modelo;
     private Connection conexion;
     private Statement sentencia;
@@ -28,9 +28,9 @@ public class Controlador {
             e.printStackTrace();
         }
     }
-    
+
     public ResultSet ObtenerCursos() {
-        String sentenciaSQL = "SELECT curso FROM cursos";
+        String sentenciaSQL = "SELECT * FROM cursos";
         try {
             sentencia = conexion.createStatement();
             resultado = sentencia.executeQuery(sentenciaSQL);
@@ -42,5 +42,19 @@ public class Controlador {
         }
         return resultado;
     }
-    
+
+    public ResultSet ObtenerAsignaturas(int cursoSeleccionado) {
+        String sentenciaSQL = "SELECT * FROM asignaturas,cursos WHERE ASIGNATURAS.idCurso = CURSOS.idCurso AND Asignaturas.idCurso ='" + cursoSeleccionado + "'";
+        try {
+            sentencia = conexion.createStatement();
+            resultado = sentencia.executeQuery(sentenciaSQL);
+
+        } catch (SQLException e) {
+            System.out.print("No se pudo realizar consulta");
+            e.printStackTrace();
+            return null;
+        }
+        return resultado;
+    }
+
 }
