@@ -2,6 +2,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.DefaultListModel;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -19,8 +20,11 @@ public class Vista extends javax.swing.JFrame {
     Asignaturas asignatura;
     Cursos curso;
     Notas nota;
+    DefaultListModel modeloLista;
+    DefaultListModel modeloLista2;
     ArrayList<Cursos> listaCursos;
     ArrayList<Asignaturas> listaAsignaturas;
+    ArrayList<Alumnos> listaAlumnos;
 
     /**
      * Creates new form Vista
@@ -28,10 +32,15 @@ public class Vista extends javax.swing.JFrame {
     public Vista() {
         initComponents();
         control = new Controlador();
+        modeloLista = new DefaultListModel();
+        modeloLista2 = new DefaultListModel();
         listaCursos = new ArrayList<Cursos>();
         listaAsignaturas = new ArrayList<Asignaturas>();
+        listaAlumnos = new ArrayList<Alumnos>();
         rellenarListaDesplegable();
         rellenarListaAsignaturas();
+        list1.setModel(modeloLista);
+        list2.setModel(modeloLista2);
     }
 
     public void rellenarListaDesplegable() {
@@ -67,6 +76,60 @@ public class Vista extends javax.swing.JFrame {
         }
     }
 
+    public void rellenarJList1() {
+        int cursoSeleccionado = listaCursos.get(cCurso.getSelectedIndex()).getIdCurso();
+        ResultSet res = control.rellenarLista1(cursoSeleccionado);
+        if (res != null) {
+            try {
+                while (res.next()) {
+                    alumno = new Alumnos(res.getInt("idAlumno"), res.getString("nombre"), res.getInt("idCurso"));
+                    listaAlumnos.add(alumno);
+                    modeloLista.addElement(alumno.getNombre());
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al rellenar lista desplegable de Asignaturas");
+            }
+        }
+    }
+
+    public void moverTodosDerecha() {
+        for (int i = 0; i < modeloLista.size(); i++) {
+            modeloLista2.addElement(modeloLista.elementAt(i));
+        }
+        modeloLista.removeAllElements();
+    }
+
+    public void moverTodosIzquierda() {
+        for (int i = 0; i < modeloLista2.size(); i++) {
+            modeloLista.addElement(modeloLista2.elementAt(i));
+        }
+        modeloLista2.removeAllElements();
+    }
+
+    public void moverSeleccionadoDerecha() {
+        try {
+            Object cosa = list1.getSelectedValue();
+            if (cosa.toString() != "") {
+                modeloLista2.addElement(cosa);
+                modeloLista.removeElement(cosa);
+            }
+        } catch (Exception evt) {
+            System.err.println("No has seleccionado nada!");
+        }
+    }
+    
+    public void moverSeleccionadoIzquierda() {
+        try {
+            Object cosa = list2.getSelectedValue();
+            if (cosa.toString() != "") {
+                modeloLista.addElement(cosa);
+                modeloLista2.removeElement(cosa);
+            }
+        } catch (Exception evt) {
+            System.err.println("No has seleccionado nada!");
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -85,13 +148,15 @@ public class Vista extends javax.swing.JFrame {
         cEvaluacion = new java.awt.Choice();
         cAsignatura = new java.awt.Choice();
         jPanel2 = new javax.swing.JPanel();
-        list2 = new java.awt.List();
-        list1 = new java.awt.List();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         evaluar = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        list1 = new javax.swing.JList();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        list2 = new javax.swing.JList();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
@@ -111,6 +176,11 @@ public class Vista extends javax.swing.JFrame {
         jLabel3.setText("Asignatura");
 
         aplicar.setText("Aplicar");
+        aplicar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aplicarActionPerformed(evt);
+            }
+        });
 
         cCurso.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -168,26 +238,62 @@ public class Vista extends javax.swing.JFrame {
         cEvaluacion.add("Evaluacion FINAL");
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(54, 38, 639, 121);
+        jPanel1.setBounds(54, 38, 621, 115);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Selección Alumnos"));
 
         jButton2.setText("> >");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("> |");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("< <");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jButton5.setText("| <");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         evaluar.setText("Evaluar");
+
+        list1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = {};
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(list1);
+
+        list2.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = {};
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane3.setViewportView(list2);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(274, Short.MAX_VALUE)
+                .addGap(21, 21, 21)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(evaluar)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
@@ -197,23 +303,15 @@ public class Vista extends javax.swing.JFrame {
                             .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jButton5, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addGap(15, 15, 15)))
-                .addGap(41, 41, 41)
-                .addComponent(list2, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(35, 35, 35)
-                    .addComponent(list1, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(380, Short.MAX_VALUE)))
+                .addGap(31, 31, 31)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(list2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGap(32, 32, 32)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -223,13 +321,14 @@ public class Vista extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
-                        .addComponent(evaluar)))
+                        .addComponent(evaluar))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane3)))
                 .addContainerGap())
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(list1, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
-                    .addContainerGap()))
         );
 
         getContentPane().add(jPanel2);
@@ -301,6 +400,26 @@ public class Vista extends javax.swing.JFrame {
         rellenarListaAsignaturas();
     }//GEN-LAST:event_cCursoItemStateChanged
 
+    private void aplicarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aplicarActionPerformed
+        rellenarJList1();
+    }//GEN-LAST:event_aplicarActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        moverTodosDerecha();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        moverTodosIzquierda();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        moverSeleccionadoDerecha();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        moverSeleccionadoIzquierda();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -352,10 +471,12 @@ public class Vista extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable2;
-    private java.awt.List list1;
-    private java.awt.List list2;
+    private javax.swing.JList list1;
+    private javax.swing.JList list2;
     private javax.swing.JButton procesar;
     private javax.swing.JButton salir;
     // End of variables declaration//GEN-END:variables
