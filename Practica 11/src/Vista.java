@@ -22,6 +22,7 @@ public class Vista extends javax.swing.JFrame {
     Notas nota;
     DefaultListModel modeloLista;
     DefaultListModel modeloLista2;
+    DefaultTableModel modelo;
     ArrayList<Cursos> listaCursos;
     ArrayList<Asignaturas> listaAsignaturas;
     ArrayList<Alumnos> listaAlumnos;
@@ -34,6 +35,7 @@ public class Vista extends javax.swing.JFrame {
         control = new Controlador();
         modeloLista = new DefaultListModel();
         modeloLista2 = new DefaultListModel();
+        modelo = new DefaultTableModel();
         listaCursos = new ArrayList<Cursos>();
         listaAsignaturas = new ArrayList<Asignaturas>();
         listaAlumnos = new ArrayList<Alumnos>();
@@ -41,6 +43,7 @@ public class Vista extends javax.swing.JFrame {
         rellenarListaAsignaturas();
         list1.setModel(modeloLista);
         list2.setModel(modeloLista2);
+        tabla.setModel(modelo);
     }
 
     public void rellenarListaDesplegable() {
@@ -117,7 +120,7 @@ public class Vista extends javax.swing.JFrame {
             System.err.println("No has seleccionado nada!");
         }
     }
-    
+
     public void moverSeleccionadoIzquierda() {
         try {
             Object cosa = list2.getSelectedValue();
@@ -129,6 +132,38 @@ public class Vista extends javax.swing.JFrame {
             System.err.println("No has seleccionado nada!");
         }
     }
+
+    public void rellenarTabla() {
+        int cont = 0;
+        int tamaño = Integer.parseInt(list2.getSize().toString());
+        String[] nombreAlumnos = new String[tamaño];
+        modelo.addColumn("Alumno");
+        for (int i = 0; i < tamaño; i++) {
+            nombreAlumnos[cont]=list2.getSelectedValue().toString();
+            list2.remove(0);
+            cont++;
+        }
+    }
+    
+//        int cursoSeleccionado = listaCursos.get(cCurso.getSelectedIndex()).getIdCurso();
+//        ResultSet res = control.ObtenerAlumnosEvaluados(cursoSeleccionado);
+//        String[] nombreAlumnos = new String[30];
+//        if (res != null) {
+//            modelo.addColumn("Alumno");
+//            try {
+//                while (res.next()) {
+//                    modelo.addColumn(cAsignatura.getSelectedItem());
+//                    for (int i = 0; i < list2.getComponentCount(); i++) {
+//                        nombreAlumnos[i] = res.getString(i);
+//                        for (int j = 0; j < nombreAlumnos.length ;j++) {
+//                             modelo.addRow(nombreAlumnos);
+//                        }
+//                    }
+//                }
+//            } catch (SQLException e) {
+//                System.err.println("Error al hacer la tabla");
+//            }
+//        }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -159,7 +194,7 @@ public class Vista extends javax.swing.JFrame {
         list2 = new javax.swing.JList();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        tabla = new javax.swing.JTable();
         procesar = new javax.swing.JButton();
         salir = new javax.swing.JButton();
 
@@ -238,7 +273,7 @@ public class Vista extends javax.swing.JFrame {
         cEvaluacion.add("Evaluacion FINAL");
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(54, 38, 621, 115);
+        jPanel1.setBounds(54, 38, 639, 121);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Selección Alumnos"));
 
@@ -271,6 +306,11 @@ public class Vista extends javax.swing.JFrame {
         });
 
         evaluar.setText("Evaluar");
+        evaluar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                evaluarActionPerformed(evt);
+            }
+        });
 
         list1.setModel(new javax.swing.AbstractListModel() {
             String[] strings = {};
@@ -336,7 +376,7 @@ public class Vista extends javax.swing.JFrame {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Evaluación Alumnos"));
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
                 {},
@@ -347,7 +387,7 @@ public class Vista extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane2.setViewportView(jTable2);
+        jScrollPane2.setViewportView(tabla);
 
         procesar.setText("Procesar");
 
@@ -420,6 +460,10 @@ public class Vista extends javax.swing.JFrame {
         moverSeleccionadoIzquierda();
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void evaluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_evaluarActionPerformed
+        rellenarTabla();
+    }//GEN-LAST:event_evaluarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -474,10 +518,10 @@ public class Vista extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable2;
     private javax.swing.JList list1;
     private javax.swing.JList list2;
     private javax.swing.JButton procesar;
     private javax.swing.JButton salir;
+    private javax.swing.JTable tabla;
     // End of variables declaration//GEN-END:variables
 }

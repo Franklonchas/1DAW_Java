@@ -71,5 +71,17 @@ public class Controlador {
         return resultado;
     }
     
+    public ResultSet ObtenerAlumnosEvaluados(int cursoSeleccionado) {
+        String sentenciaSQL = "SELECT * FROM alumnos,cursos WHERE alumnos.idCurso = CURSOS.idCurso AND alumnos.idCurso ='" + cursoSeleccionado + "'";
+        try {
+            sentencia = conexion.createStatement();
+            resultado = sentencia.executeQuery(sentenciaSQL);
 
+        } catch (SQLException e) {
+            System.out.print("No se pudo realizar consulta");
+            e.printStackTrace();
+            return null;
+        }
+        return resultado;
+    }
 }
