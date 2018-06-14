@@ -1,103 +1,110 @@
-/**
- *
- * @author Medina
- */
+
 import java.sql.*;
 import java.text.DecimalFormat;
 import javax.swing.table.DefaultTableModel;
 
 public class EstadisticaTodasAsignaturas extends javax.swing.JFrame {
 
-    /** Creates new form EvaluacionAsignatura */
+    /**
+     * Creates new form EvaluacionAsignatura
+     */
     AlumnosBD alumnos;
-    int idCurso=0;
+    int idCurso = 0;
     int idAsignaturas[];
     int idAlumnos[];
-    String asignaturas [];
-    boolean existe=false;
+    String asignaturas[];
+    boolean existe = false;
     String tituloColumnas[];
     DefaultTableModel modelo;
-    
+
     public EstadisticaTodasAsignaturas() {
         initComponents();
-        alumnos=new AlumnosBD();
-        rellenarCursos();        
+        alumnos = new AlumnosBD();
+        rellenarCursos();
     }
-    public void rellenarCursos(){
+
+    public void rellenarCursos() {
         jComboBox1.removeAllItems();
-        ResultSet res=alumnos.obtenerTabla("Cursos");
-        if(res!=null){            
-            try{
-                while(res.next()){
-                    String curso=res.getString("curso");
+        ResultSet res = alumnos.obtenerTabla("Cursos");
+        if (res != null) {
+            try {
+                while (res.next()) {
+                    String curso = res.getString("curso");
                     jComboBox1.addItem(curso);
                 }
-            }catch(SQLException e){
+            } catch (SQLException e) {
                 System.out.println("error");
-            }        
+            }
         }
     }
+
     public void generarTabla(int nAsignaturas) {
         modelo = new DefaultTableModel();
         modelo.addColumn("      ");
-        for(int i=0; i<nAsignaturas; i++)
+        for (int i = 0; i < nAsignaturas; i++) {
             modelo.addColumn(asignaturas[i]);
-        for(int i=1;i<=5; i++) 
+        }
+        for (int i = 1; i <= 5; i++) {
             agregarFilaTabla();
+        }
         modelo.setValueAt("Insuficiente", 0, 0);
         modelo.setValueAt("Suficiente", 1, 0);
         modelo.setValueAt("Bien", 2, 0);
         modelo.setValueAt("Notable", 3, 0);
         modelo.setValueAt("Sobresaliente", 4, 0);
-        jTable1.setModel(modelo);        
+        jTable1.setModel(modelo);
     }
-    public void agregarFilaTabla(){               
+
+    public void agregarFilaTabla() {
         Object[] fila = new Object[modelo.getColumnCount()];
-        modelo.addRow(fila);          
-    }    
-    public void limpiarTabla(int col){
-        for(int fila=0; fila<5; fila++)
-            for(int j=1; j<col; j++)
-                jTable1.setValueAt("",fila, j);
-    }  
-    
-    public void visualizarEstadistica(){
-        DecimalFormat df = new DecimalFormat("0.0");
-        idCurso=alumnos.idClaveTabla("Cursos", "curso", (String) jComboBox1.getSelectedItem());
-        idAlumnos=alumnos.obtenerAlumnos(idCurso);
-        idAsignaturas=alumnos.obtenerAsignaturas(idCurso);
-        existe=true;
-        asignaturas=alumnos.obtenerNombreAsignaturas(idCurso);
-        generarTabla(asignaturas.length);           
-        for(int asig=0; asig<asignaturas.length; asig++){
-            float ins=0, suf=0, bien=0, not=0, sob=0;
-            for(int i=0; i<idAlumnos.length; i++){
-                int nota=alumnos.obtenerNota(idAlumnos[i], idCurso, idAsignaturas[asig], (String) jComboBox2.getSelectedItem());
-                if(nota==-1)
-                    existe=false;
-                if(nota<5)
-                    ins++;
-                else
-                    if(nota<6)
-                        suf++;
-                    else
-                        if(nota<7)
-                            bien++;
-                        else
-                            if(nota<9)
-                                not++;
-                             else
-                                sob++;
-            }
-            if(existe){
-                modelo.setValueAt(""+df.format(ins*100/idAlumnos.length)+" %", 0, asig+1);
-                modelo.setValueAt(""+df.format(suf*100/idAlumnos.length)+" %", 1, asig+1);
-                modelo.setValueAt(""+df.format(bien*100/idAlumnos.length)+" %", 2, asig+1);
-                modelo.setValueAt(""+df.format(not*100/idAlumnos.length)+" %", 3, asig+1);
-                modelo.setValueAt(""+df.format(sob*100/idAlumnos.length)+" %", 4, asig+1);
+        modelo.addRow(fila);
+    }
+
+    public void limpiarTabla(int col) {
+        for (int fila = 0; fila < 5; fila++) {
+            for (int j = 1; j < col; j++) {
+                jTable1.setValueAt("", fila, j);
             }
         }
     }
+
+    public void visualizarEstadistica() {
+        DecimalFormat df = new DecimalFormat("0.0");
+        idCurso = alumnos.idClaveTabla("Cursos", "curso", (String) jComboBox1.getSelectedItem());
+        idAlumnos = alumnos.obtenerAlumnos(idCurso);
+        idAsignaturas = alumnos.obtenerAsignaturas(idCurso);
+        existe = true;
+        asignaturas = alumnos.obtenerNombreAsignaturas(idCurso);
+        generarTabla(asignaturas.length);
+        for (int asig = 0; asig < asignaturas.length; asig++) {
+            float ins = 0, suf = 0, bien = 0, not = 0, sob = 0;
+            for (int i = 0; i < idAlumnos.length; i++) {
+                int nota = alumnos.obtenerNota(idAlumnos[i], idCurso, idAsignaturas[asig], (String) jComboBox2.getSelectedItem());
+                if (nota == -1) {
+                    existe = false;
+                }
+                if (nota < 5) {
+                    ins++;
+                } else if (nota < 6) {
+                    suf++;
+                } else if (nota < 7) {
+                    bien++;
+                } else if (nota < 9) {
+                    not++;
+                } else {
+                    sob++;
+                }
+            }
+            if (existe) {
+                modelo.setValueAt("" + df.format(ins * 100 / idAlumnos.length) + " %", 0, asig + 1);
+                modelo.setValueAt("" + df.format(suf * 100 / idAlumnos.length) + " %", 1, asig + 1);
+                modelo.setValueAt("" + df.format(bien * 100 / idAlumnos.length) + " %", 2, asig + 1);
+                modelo.setValueAt("" + df.format(not * 100 / idAlumnos.length) + " %", 3, asig + 1);
+                modelo.setValueAt("" + df.format(sob * 100 / idAlumnos.length) + " %", 4, asig + 1);
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -245,12 +252,12 @@ public class EstadisticaTodasAsignaturas extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
-       //rellenarAsignaturas();
+        //rellenarAsignaturas();
     }//GEN-LAST:event_jComboBox1ItemStateChanged
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
